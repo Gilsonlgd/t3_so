@@ -1,0 +1,54 @@
+QUANTUM PEQUENO: 5
+|Informacoes do SO:|
+TempoT_exec: 1237, Tempo_CPU: 1237, Num_Interrup: 241
+----------------------------------------------
+|Metricas dos processos: quantum = 5|
+num:1, tempo_retorno: 744, tempo_bloq: 481,
+ tempo_exec: 135, tempo_esp: 341, tempoM_retorno: 56,8333320618,
+ num_bloq: 2, num_preemp: 4
+ 
+num:2, tempo_retorno: 1233, tempo_bloq: 1012,
+ tempo_exec: 133, tempo_esp: 200, tempoM_retorno: 40,0000000000,
+ num_bloq: 2, num_preemp: 3 
+
+num:3, tempo_retorno: 860, tempo_bloq: 580,
+ tempo_exec: 104, tempo_esp: 171, tempoM_retorno: 19,0000000000,
+ num_bloq: 9, num_preemp: 0 
+
+
+
+QUANTUM MEDIO: 10
+|Informacoes do SO:|
+TempoT_exec: 805, Tempo_CPU: 805, Num_Interrup: 157
+----------------------------------------------
+|Metricas dos processos: quantum = 10|
+num:1, tempo_retorno: 454, tempo_bloq: 186,
+ tempo_exec: 145, tempo_esp: 164, tempoM_retorno: 41,0000000000,
+ num_bloq: 3, num_preemp: 1
+
+num:2, tempo_retorno: 801, tempo_bloq: 648,
+ tempo_exec: 52, tempo_esp: 60, tempoM_retorno: 60,0000000000,
+ num_bloq: 1, num_preemp: 0 
+
+num:3, tempo_retorno: 590, tempo_bloq: 276,
+ tempo_exec: 106, tempo_esp: 203, tempoM_retorno: 20,2999992371,
+ num_bloq: 10, num_preemp: 0 
+
+QUANTUM GRANDE: 20
+|Informacoes do SO:|
+TempoT_exec: 760, Tempo_CPU: 760, Num_Interrup: 147
+----------------------------------------------
+|Metricas dos processos: quantum = 20|
+num:1, tempo_retorno: 553, tempo_bloq: 306,
+ tempo_exec: 153, tempo_esp: 86, tempoM_retorno: 21,5000000000,
+ num_bloq: 4, num_preemp: 0 
+
+num:2, tempo_retorno: 756, tempo_bloq: 597,
+ tempo_exec: 53, tempo_esp: 65, tempoM_retorno: 65,0000000000,
+ num_bloq: 1, num_preemp: 0 
+
+num:3, tempo_retorno: 575, tempo_bloq: 262,
+ tempo_exec: 107, tempo_esp: 201, tempoM_retorno: 22,3333339691,
+ num_bloq: 9, num_preemp: 0 
+
+

@@ -1,0 +1,10 @@
+SO_CRIA e SO_FIM devem ser criadas.
+
+SO_LE e SO_ESCR devem ser alteradas para chamar es_pronto e bloquear o processo caso o dispositivo não esteja pronto.
+Cada vez que o SO executa, deve verificar todos os processos bloqueados, e testar se cada um deve desbloquear (chamando es_pronto).
+
+As 4 chamadas de sistema devem ser alteradas
+
+O escalonador pode ser o mais simples possível, escolhe qualquer dos processos que esteja pronto.
+
+Caso o escalonador não tenha conseguido escolher nenhum processo (não tem nenhum processo pronto), o despacho simplesmente coloca a CPU em modo zumbi.
