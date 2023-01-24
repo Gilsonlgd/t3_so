@@ -104,7 +104,9 @@ static void so_trata_sisop_fim(so_t *self)
 static void so_trata_sisop_cria(so_t *self)
 {
   processo_t* processo = processo_cria(cpue_A(self->cpue), pronto, rel_agora( contr_rel(self->contr) ));
-  err_t err = processo_init_mem(processo);
+  // inicia o a tabela de páginas e insere o processo na mem
+  err_t err = processo_init_mem(processo, contr_mmu(self->contr));
+  
   if (err != ERR_OK) {
     panico(self);
   } else {

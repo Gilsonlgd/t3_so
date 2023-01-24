@@ -1,5 +1,6 @@
 #include "contr.h"
 #include "mem.h"
+#include "mmu.h"
 #include "exec.h"
 #include "rel.h"
 #include "term.h"
@@ -17,6 +18,7 @@
 
 struct contr_t {
   mem_t *mem;
+  mmu_t *mmu;
   exec_t *exec;
   rel_t *rel;
   rand_t *rand;
@@ -33,8 +35,9 @@ contr_t *contr_cria(void)
 {
   contr_t *self = malloc(sizeof(*self));
   if (self == NULL) return NULL;
-  // cria a memória
+  // cria a memória e a mmu
   self->mem = mem_cria(MEM_TAM);
+  self->mmu = mmu_cria(self->mem, 10);
   // cria dispositivos de E/S (o relógio e um terminal)
   self->term = term_cria();
   self->rel = rel_cria(5);
@@ -48,7 +51,7 @@ contr_t *contr_cria(void)
   es_registra_dispositivo(self->es, 3, self->rel, 1, rel_le, NULL, NULL);
   es_registra_dispositivo(self->es, 4, self->rand, 0, rand_le, NULL, rand_pronto);
   // cria a unidade de execução e inicializa com a memória e E/S
-  self->exec = exec_cria(self->mem, self->es);
+  self->exec = exec_cria(self->mmu, self->es);
   self->so = NULL;
   return self;
 }
@@ -74,6 +77,11 @@ void contr_informa_so(contr_t *self, so_t *so)
 mem_t *contr_mem(contr_t *self)
 {
   return self->mem;
+}
+
+mmu_t *contr_mmu(contr_t *self)
+{
+  return self->mmu;
 }
 
 exec_t *contr_exec(contr_t *self)

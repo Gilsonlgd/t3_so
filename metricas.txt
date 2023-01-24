@@ -1,16 +1,16 @@
 |Informacoes do SO:|
-TempoT_exec: 3077, Tempo_CPU: 3077, Num_Interrup: 626
+TempoT_exec: 958, Tempo_CPU: 958, Num_Interrup: 202
 ----------------------------------------------
 |Metricas dos processos: quantum = 5|
-num:2, tempo_retorno: 3073, tempo_bloq: 3018,
- tempo_exec: 32, tempo_esp: 40, tempoM_retorno: 20,0000000000,
+num:2, tempo_retorno: 954, tempo_bloq: 881,
+ tempo_exec: 59, tempo_esp: 40, tempoM_retorno: 13,3333330154,
+ num_bloq: 2, num_preemp: 1 
+
+num:1, tempo_retorno: 508, tempo_bloq: 451,
+ tempo_exec: 32, tempo_esp: 42, tempoM_retorno: 21,0000000000,
  num_bloq: 1, num_preemp: 1 
 
-num:3, tempo_retorno: 679, tempo_bloq: 519,
- tempo_exec: 104, tempo_esp: 46, tempoM_retorno: 4,5999999046,
+num:3, tempo_retorno: 244, tempo_bloq: 126,
+ tempo_exec: 103, tempo_esp: 6, tempoM_retorno: 0,6000000238,
  num_bloq: 10, num_preemp: 0 
-
-num:1, tempo_retorno: 664, tempo_bloq: 558,
- tempo_exec: 50, tempo_esp: 82, tempoM_retorno: 20,5000000000,
- num_bloq: 3, num_preemp: 1 
 

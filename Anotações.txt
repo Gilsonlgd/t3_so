@@ -1,28 +1,10 @@
-Escalonador circular (round-robin).
-- Nesse escalonador, os processos prontos são colocados em uma fila. (FEITO)
-- Quando há uma troca de processo, é escolhido o primeiro da fila. (FEITO)
-- Quando o estado de um processo muda para pronto (ou quando há prempção), é colocado no final da fila. (FEITO)
-- Quando um processo é retirado da fila (foi o escolhido para executar), recebe um quantum, uma certa quantidade de tempo de CPU que ele tem o direito de usar. (FEITO)
-- Cada vez que o SO executa, o escalonador verifica se o processe em execução não ultrapassou seu quantum, e realiza a preempção (FEITO)
-- O quantum é igual para todos, e geralmente corresponde ao tempo de algumas interrupções de relógio. (FEITO)
-
-Escalonador processo mais curto.
-- É escolhido o processo que se acha que vai executar por menos tempo, entre os processos prontos.
-- O tempo esperado de execução de um processo é calculado cada vez que ele perde o processador, seja por bloqueio ou por preempção
-- A preempção é feita como no circular, com um quantum.
-- Considere o tempo esperado para um processo recém criado como sendo igual ao quantum
-
-
-Adicionar métricas: 
-- tempo total de execução do sistema (FEITO)
-- tempo total de uso da CPU (é o tempo acima menos o tempo que a CPU ficou parada) (FEITO)
-- número de interrupções atendidas (FEITO)	
-
-para cada processo:
-- tempo de retorno (tempo entre criação e término) (FEITO)
-- tempo total bloqueado (tempo no estado B) (FEITO)
-- tempo total de CPU (tempo no estado E) (FEITO)
-- tempo total de espera (tempo no estado P) (FEITO)
-- tempo médio de retorno (média do tempo entre sair do estado B e entrar no E) (FEITO)
-- número de bloqueios (FEITO)
-- número de preempções (FEITO)
+PARTE 1: 
+- Altere a sua implementação de processos para manter todos os processos na memória ao mesmo tempo. 
+- MMU será usada para proteção de memória e relocação, mas ainda não para memória virtual com uso de área de troca.
+- Defina a memória principal com tamanho suficiente para conter todos os processos que serão executados. (FEITO)
+- Uma página não pode ser usada por mais de um processo por vez.
+- Na criação de um processo, coloque todo o conteúdo dele em uma região livre da memória principal.
+- A alocação da memória principal deve ser feita em quadros.
+- Crie e inicialize uma tabela de páginas para o processo. (FEITO)
+- A página 0 do processo deve corresponder ao primeiro quadro usado para esse processo, a página 1 ao segundo etc. 
+- Quando houver troca de processo, altere a tabela a ser usada pela MMU para a tabela do processo que irá executar, não altere a memória. 

@@ -6,6 +6,8 @@
 #include "es.h"
 #include "contr.h"
 #include "tela.h"
+#include "tab_pag.h"
+#include "mmu.h"
 
 struct processo_t {
   int num;
@@ -17,6 +19,7 @@ struct processo_t {
   acesso_t chamada_bloqueio;
   processo_estado_t estado;
   mem_t* memoria;
+  tab_pag_t* tab_pag;
   cpu_estado_t* cpu_estado;
 };
 
@@ -34,12 +37,14 @@ processo_t *processo_cria(int num, processo_estado_t estado, int agora)
     self->t_finalizacao = 0;
     self->metricas = calloc(8, sizeof(int));
     self->quantum = 0;
+    self->tab_pag = NULL;
     return self;
 }
 
-err_t processo_init_mem(processo_t *self)
+err_t processo_init_mem(processo_t *self, mmu_t* mmu)
 {
     int num = self->num;
+    int tam_progr = 0;
 
     switch (num)
     {
@@ -47,24 +52,46 @@ err_t processo_init_mem(processo_t *self)
         int progr1[] = {
             #include "p1.maq"
         };
-        int tam_progr1 = sizeof(progr1)/sizeof(progr1[0]);
-        return transf_mem(self, progr1, tam_progr1);
+        tam_progr = sizeof(progr1)/sizeof(progr1[0]);
+        processo_init_tab_pag(self, mmu, tam_progr);
+        return transf_mem(self, progr1, tam_progr);
     case 2:
         int progr2[] = {
             #include "p2.maq"
         };
-        int tam_progr2 = sizeof(progr2)/sizeof(progr2[0]);
-        return transf_mem(self, progr2, tam_progr2);
+        tam_progr = sizeof(progr2)/sizeof(progr2[0]);
+        processo_init_tab_pag(self, mmu, tam_progr);
+        return transf_mem(self, progr2, tam_progr);
     case 3:
         int progr3[] = {
             #include "p3.maq"
         };
-        int tam_progr3 = sizeof(progr3)/sizeof(progr3[0]);
-        return transf_mem(self, progr3, tam_progr3);
+        tam_progr = sizeof(progr3)/sizeof(progr3[0]);
+        processo_init_tab_pag(self, mmu, tam_progr);
+        return transf_mem(self, progr3, tam_progr);
     default:
         int* progr = NULL;
         return transf_mem(self, progr, 0);
     }
+
+}
+
+void processo_init_tab_pag(processo_t* self, mmu_t* mmu, int tam_progr)
+{
+    int num_pags = tam_progr / TAM_PAG + (tam_progr % TAM_PAG == 0 ? 0 : 1);
+    tab_pag_t* tab_pag = tab_pag_cria(num_pags, TAM_PAG);
+
+    for (int id_pag = 0; id_pag < num_pags; id_pag++) {
+        int id_quadro = mmu_proxQuadro_livre(mmu);
+        if (id_quadro != -1) {
+            tab_pag_muda_quadro(tab_pag, id_pag, id_quadro);
+            mmu_ocupa_quadro(mmu, id_quadro);
+        } else {
+            break;
+        }
+    }
+
+    self->tab_pag = tab_pag; 
 }
 
 err_t transf_mem(processo_t *self, int* progr, int tam_progr)
@@ -91,6 +118,7 @@ void processo_destroi(processo_t* self, int agora)
         if (self->metricas != NULL) {
             free(self->metricas);
         }
+        tab_pag_destroi(self->tab_pag);
         free(self);
     } else {
         t_printf("Erro ao destruir processo");
@@ -153,6 +181,10 @@ acesso_t processo_chamada(processo_t* processo)
 
 cpu_estado_t* processo_cpu(processo_t* self) {
     return self->cpu_estado;
+}
+
+tab_pag_t* processo_tab_pag(processo_t* self) {
+    return self->tab_pag;
 }
 
 processo_estado_t processo_estado(processo_t* self){
