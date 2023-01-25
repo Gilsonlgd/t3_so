@@ -37,7 +37,7 @@ contr_t *contr_cria(void)
   if (self == NULL) return NULL;
   // cria a memória e a mmu
   self->mem = mem_cria(MEM_TAM);
-  self->mmu = mmu_cria(self->mem, 10);
+  self->mmu = mmu_cria(self->mem);
   // cria dispositivos de E/S (o relógio e um terminal)
   self->term = term_cria();
   self->rel = rel_cria(5);
@@ -66,6 +66,7 @@ void contr_destroi(contr_t *self)
   t_fim();
   mem_destroi(self->mem);
   rand_destroi(self->rand);
+  mmu_destroi(self->mmu);
   free(self);
 }
 
@@ -121,21 +122,21 @@ void contr_laco(contr_t *self)
 }
  
 
-static void str_estado(char *txt, exec_t *exec, mem_t *mem)
+static void str_estado(char *txt, exec_t *exec, mmu_t* mmu)
 {
   // pega o estado da CPU, imprime registradores, opcode, instrução
   cpu_estado_t *estado = cpue_cria();
   exec_copia_estado(exec, estado);
   int pc, opcode = -1;
   pc = cpue_PC(estado);
-  mem_le(mem, pc, &opcode);
+  mmu_le(mmu, pc, &opcode);
   sprintf(txt, "PC=%04d A=%06d X=%06d %02d %s",
                 pc, cpue_A(estado), cpue_X(estado), opcode, instr_nome(opcode));
   // imprime argumento da instrução, se houver
   if (instr_num_args(opcode) > 0) {
     char aux[40];
     int A1;
-    mem_le(mem, pc+1, &A1);
+    mmu_le(mmu, pc+1, &A1);
     sprintf(aux, " %d", A1);
     strcat(txt, aux);
   }
@@ -152,7 +153,7 @@ static void str_estado(char *txt, exec_t *exec, mem_t *mem)
 void contr_atualiza_estado(contr_t *self)
 {
   char s[N_COL+1];
-  str_estado(s, self->exec, self->mem);
+  str_estado(s, self->exec, self->mmu);
   t_status(s);
 }
 

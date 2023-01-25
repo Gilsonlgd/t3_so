@@ -11,17 +11,16 @@
 struct mmu_t {
   mem_t *mem;          // a memória física
   tab_pag_t *tab_pag;  // a tabela de páginas
-  int tam_quadros;
   int num_quadros;
   bool* mem_bitmap;
   int ultimo_endereco; // o último endereço virtual traduzido pela MMU
 };
 
-mmu_t *mmu_cria(mem_t *mem, int tam_quadros)
+mmu_t *mmu_cria(mem_t *mem)
 {
   mmu_t *self;
   int tam_mem = mem_tam(mem);
-  int num_quadros = tam_mem / tam_quadros;
+  int num_quadros = tam_mem / TAM_QUADRO;
 
   self = malloc(sizeof(*self));
   if (self != NULL) {
@@ -30,7 +29,6 @@ mmu_t *mmu_cria(mem_t *mem, int tam_quadros)
     
     self->mem = mem;
     self->tab_pag = NULL;
-    self->tam_quadros = tam_quadros;
     self->num_quadros = num_quadros;
   }
   return self;
@@ -98,4 +96,39 @@ int mmu_ultimo_endereco(mmu_t *self)
 void mmu_ocupa_quadro(mmu_t* self, int id_quadro)
 {
   self->mem_bitmap[id_quadro] = false;
+}
+
+void mmu_libera_quadro(mmu_t* self, int id_quadro)
+{
+  self->mem_bitmap[id_quadro] = true;
+}
+
+// ATENÇÃO
+// talve não use pra nada
+err_t mmu_escreve_quadro(mmu_t* self, int id_quadro, int* progr, int pag)
+{
+  err_t err = ERR_OK;
+  int inicio_quadro = id_quadro * TAM_QUADRO;
+  int fim_quadro = inicio_quadro + TAM_PAG;
+
+  int p_pagina = pag * TAM_PAG;
+
+  for (int i = inicio_quadro; i < fim_quadro; i++, p_pagina++) {
+    err = mem_escreve(self->mem, i, progr[p_pagina]);
+    if (err != ERR_OK) {
+      t_printf("mmu.escreve_quadro: problema ao escrever mem. Pos: %d", i);
+      return err;
+    }
+  }
+  return err;
+}
+
+mem_t* mmu_mem(mmu_t* self)
+{
+  return self->mem;
+}
+
+tab_pag_t* mmu_tab_pag(mmu_t* self)
+{
+  return self->tab_pag;
 }

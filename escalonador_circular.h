@@ -30,10 +30,10 @@ void insereI_lista(no_t** head, processo_t* processo);
 processo_t* retorna_proximo_pronto(esc_circ_t* self);
 
 //faz o que o nome diz
-err_t finaliza_processo_em_exec(esc_circ_t* self, rel_t *rel);
+err_t finaliza_processo_em_exec(esc_circ_t* self, mmu_t* mmu, rel_t *rel);
 
 //faz o que o nome diz também
-void bloqueia_processo_em_exec(esc_circ_t* self, mem_t *mem, 
+void bloqueia_processo_em_exec(esc_circ_t* self, mmu_t* mmu, 
                                cpu_estado_t *cpu_estado, int disp, 
                                acesso_t chamada, rel_t *rel);
 
@@ -56,7 +56,7 @@ processo_t* esc_processo_executando(esc_circ_t* self);
 //realiza a iteração do quantum do processo em execução. 
 //após, verifica seu quantum atual. 
 //caso tenha ultrapassado o quantum definido, realiza preempção
-void esc_check_quantum(esc_circ_t* self, mem_t *mem, cpu_estado_t *cpu_estado, rel_t *rel);
+void esc_check_quantum(esc_circ_t* self, mmu_t* mmu, cpu_estado_t *cpu_estado, rel_t *rel);
 
 //retorna o quantum definido pelo escalonador
 int esc_quantum(esc_circ_t* self);

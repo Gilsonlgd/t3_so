@@ -100,25 +100,26 @@ processo_t* retorna_proximo_pronto(esc_circ_t* self) {
     return self->em_exec;
 }
 
-err_t finaliza_processo_em_exec(esc_circ_t* self, rel_t *rel)
+err_t finaliza_processo_em_exec(esc_circ_t* self, mmu_t* mmu, rel_t *rel)
 {   
     err_t err = ERR_OK;
     //Se não resgistrar as métricas de cada processo:
-    //processo_destroi(self->em_exec, rel_agora(rel));
+    //processo_destroi(self->em_exec, mmu, rel_agora(rel));
 
     //Registrando as métricas de cada processo:
-    processo_finaliza(self->em_exec, rel_agora(rel));
+    processo_finaliza(self->em_exec, mmu, rel_agora(rel));
     insereI_lista(&self->lista_finalizados, self->em_exec);
     self->em_exec = NULL;
     return err;   
 }
 
-void bloqueia_processo_em_exec(esc_circ_t* self, mem_t *mem, 
+void bloqueia_processo_em_exec(esc_circ_t* self, mmu_t* mmu, 
                                cpu_estado_t *cpu_estado, int disp, 
                                acesso_t chamada, rel_t *rel)
 {
-    processo_es_bloqueia(self->em_exec, mem, cpu_estado, 
+    processo_es_bloqueia(self->em_exec, cpu_estado, 
                       disp, chamada, rel_agora(rel));
+    mmu_usa_tab_pag(mmu, NULL);
     insereI_lista(&self->lista_bloqueados, self->em_exec);
     self->em_exec = NULL;
 }
@@ -149,7 +150,7 @@ void varre_processos_bloqueados(esc_circ_t* self, contr_t *contr, rel_t *rel)
     }
 }
 
-void esc_check_quantum(esc_circ_t* self, mem_t *mem, cpu_estado_t *cpu_estado, rel_t *rel)
+void esc_check_quantum(esc_circ_t* self, mmu_t* mmu, cpu_estado_t *cpu_estado, rel_t *rel)
 {
     if (self->em_exec == NULL) {
         return;
@@ -158,7 +159,8 @@ void esc_check_quantum(esc_circ_t* self, mem_t *mem, cpu_estado_t *cpu_estado, r
     }
 
     if (processo_quantum(self->em_exec) < 0) {
-        processo_preempta(self->em_exec, mem, cpu_estado, rel_agora(rel));
+        processo_preempta(self->em_exec, cpu_estado, rel_agora(rel));
+        mmu_usa_tab_pag(mmu, NULL);
         insere_fila(self, self->em_exec);
         self->em_exec = NULL;
     }

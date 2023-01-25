@@ -12,6 +12,9 @@
 // tipo opaco que representa o gerenciador de memória
 typedef struct mmu_t mmu_t;
 
+#define TAM_QUADRO 10
+#define TAM_PAG 10
+
 // cria um gerenciador de memória para gerenciar acessos à memória
 //   representada por 'mem'
 // deve receber uma tabela de páginas para poder realizar a conversão
@@ -19,7 +22,7 @@ typedef struct mmu_t mmu_t;
 // retorna um ponteiro para um descritor, que deverá ser usado em todas
 //   as operações
 // retorna NULL em caso de erro
-mmu_t *mmu_cria(mem_t *mem, int tam_quadros);
+mmu_t *mmu_cria(mem_t *mem);
 
 // destrói um gerenciador de memória
 // nenhuma outra operação pode ser realizada no gerenciador após
@@ -52,5 +55,13 @@ int mmu_ultimo_endereco(mmu_t *self);
 int mmu_proxQuadro_livre(mmu_t *self);
 
 void mmu_ocupa_quadro(mmu_t* self, int id_quadro);
+
+void mmu_libera_quadro(mmu_t* self, int id_quadro);
+
+err_t mmu_escreve_quadro(mmu_t* self, int id_quadro, int* progr, int pag);
+
+mem_t* mmu_mem(mmu_t* self);
+
+tab_pag_t* mmu_tab_pag(mmu_t* self);
 
 #endif // MMU_H

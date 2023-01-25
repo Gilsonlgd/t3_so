@@ -15,7 +15,6 @@ struct so_t {
 };
 
 // funções auxiliares
-static void init_mem(so_t *self);
 static void panico(so_t *self);
 
 so_t *so_cria(contr_t *contr)
@@ -27,9 +26,9 @@ so_t *so_cria(contr_t *contr)
   self->contr = contr;
   self->paniquei = false;
   self->cpue = cpue_cria();
-  init_mem(self);
   //Cria o primeiro processo
   processo_t* processo = processo_cria(0, pronto, rel_agora(rel));
+  processo_init_mem(processo, contr_mmu(self->contr));
   processo_executa(processo, rel_agora(rel), esc_quantum(self->escalonador));
   esc_init(self->escalonador, processo);
   // coloca a CPU em modo usuário
@@ -64,7 +63,7 @@ static void so_trata_sisop_le(so_t *self)
     cpue_muda_A(self->cpue, err);
     cpue_muda_X(self->cpue, val);
   } else {
-    bloqueia_processo_em_exec(self->escalonador, contr_mem(self->contr), 
+    bloqueia_processo_em_exec(self->escalonador, contr_mmu(self->contr), 
                               self->cpue, disp, leitura, contr_rel(self->contr));
   }
 }
@@ -85,7 +84,7 @@ static void so_trata_sisop_escr(so_t *self)
     err = es_escreve(contr_es(self->contr), disp, val);
     cpue_muda_A(self->cpue, err);
   } else {
-    bloqueia_processo_em_exec(self->escalonador, contr_mem(self->contr), 
+    bloqueia_processo_em_exec(self->escalonador, contr_mmu(self->contr), 
                               self->cpue, disp, escrita, contr_rel(self->contr)); 
   }
 }
@@ -93,7 +92,7 @@ static void so_trata_sisop_escr(so_t *self)
 // chamada de sistema para término do processo
 static void so_trata_sisop_fim(so_t *self)
 {
-  err_t err = finaliza_processo_em_exec(self->escalonador, contr_rel(self->contr));
+  err_t err = finaliza_processo_em_exec(self->escalonador, contr_mmu(self->contr), contr_rel(self->contr));
   if(err != ERR_OK) {
     t_printf("Erro na finalizacao do processo.");
     self->paniquei = true;
@@ -142,7 +141,7 @@ static void so_trata_sisop(so_t *self)
 // trata uma interrupção de tempo do relógio
 static void so_trata_tic(so_t *self)
 {
-  esc_check_quantum(self->escalonador, contr_mem(self->contr), self->cpue, contr_rel(self->contr));
+  esc_check_quantum(self->escalonador, contr_mmu(self->contr), self->cpue, contr_rel(self->contr));
 }
 
 void chama_escalonamento(so_t* self, err_t err)
@@ -158,11 +157,12 @@ void chama_escalonamento(so_t* self, err_t err)
     processo_t* processo = retorna_proximo_pronto(self->escalonador);
     if (processo == NULL) {
       cpue_muda_modo(self->cpue, zumbi, contr_rel(self->contr));
+      mmu_usa_tab_pag(contr_mmu(self->contr), NULL);
     } else {
       cpue_muda_modo(self->cpue, usuario, contr_rel(self->contr));
       processo_executa(processo, rel_agora( contr_rel(self->contr) ), esc_quantum(self->escalonador));
       cpue_copia(processo_cpu(processo), self->cpue);
-      contr_copia_mem(self->contr, processo_mem(processo));
+      mmu_usa_tab_pag(contr_mmu(self->contr), processo_tab_pag(processo));
     }
     inc = 0;
   }
@@ -219,25 +219,6 @@ void so_imprime_metricas(so_t *self)
   fprintf(arq,"|Metricas dos processos: quantum = %d|\n", esc_quantum(self->escalonador));
   esc_imprime_metricas(self->escalonador, arq);
   fclose(arq);
-}
-
-// carrega o programa inicial na memória
-static void init_mem(so_t *self)
-{
-  // programa para executar na nossa CPU
-  int progr[] = {
-    #include "init.maq"
-  };
-  int tam_progr = sizeof(progr)/sizeof(progr[0]);
-
-  // inicializa a memória com o programa 
-  mem_t *mem = contr_mem(self->contr);
-  for (int i = 0; i < tam_progr; i++) {
-    if (mem_escreve(mem, i, progr[i]) != ERR_OK) {
-      t_printf("so.init_mem: erro de memória, endereco %d\n", i);
-      panico(self);
-    }
-  }
 }
   
 static void panico(so_t *self) 
