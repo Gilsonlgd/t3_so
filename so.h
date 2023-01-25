@@ -23,6 +23,8 @@ typedef enum {
 #include "err.h"
 #include <stdbool.h>
 
+#define SO_INIT 0
+
 so_t *so_cria(contr_t *contr);
 
 void so_destroi(so_t *self);

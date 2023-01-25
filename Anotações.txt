@@ -1,10 +1,16 @@
 PARTE 1: 
-- Altere a sua implementação de processos para manter todos os processos na memória ao mesmo tempo. 
-- MMU será usada para proteção de memória e relocação, mas ainda não para memória virtual com uso de área de troca.
+- Altere a sua implementação de processos para manter todos os processos na memória ao mesmo tempo. (FEITO)
+- MMU será usada para proteção de memória e relocação, mas ainda não para memória virtual com uso de área de troca. (FEITO)
 - Defina a memória principal com tamanho suficiente para conter todos os processos que serão executados. (FEITO)
-- Uma página não pode ser usada por mais de um processo por vez.
+- Uma página não pode ser usada por mais de um processo por vez. (FEITO)
 - Na criação de um processo, coloque todo o conteúdo dele em uma região livre da memória principal. (FEITO)
 - A alocação da memória principal deve ser feita em quadros. (FEITO)
 - Crie e inicialize uma tabela de páginas para o processo. (FEITO)
 - A página 0 do processo deve corresponder ao primeiro quadro usado para esse processo, a página 1 ao segundo etc. (FEITO)
-- Quando houver troca de processo, altere a tabela a ser usada pela MMU para a tabela do processo que irá executar, não altere a memória. 
+- Quando houver troca de processo, altere a tabela a ser usada pela MMU para a tabela do processo que irá executar, não altere a memória. (FEITO)
+
+FAZER:
+- Ajeitar proc_rapido
+- Arrumar alterações do benhur
+
+PARTE 2:

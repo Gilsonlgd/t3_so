@@ -1,6 +1,7 @@
 #include "so.h"
 #include "tela.h"
-#include "escalonador_circular.h"
+//#include "escalonador_circular.h"
+#include "escalonador_proc_rapido.h"
 #include "processo.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +11,8 @@ struct so_t {
   contr_t *contr;       // o controlador do hardware
   bool paniquei;        // apareceu alguma situação intratável
   cpu_estado_t *cpue;   // cópia do estado da CPU
-  esc_circ_t* escalonador;    // tabela de processos
+  //esc_circ_t* escalonador;    // tabela de processos
+  esc_rap_t* escalonador;
   int num_interrup;
 };
 
@@ -27,7 +29,7 @@ so_t *so_cria(contr_t *contr)
   self->paniquei = false;
   self->cpue = cpue_cria();
   //Cria o primeiro processo
-  processo_t* processo = processo_cria(0, pronto, rel_agora(rel));
+  processo_t* processo = processo_cria(SO_INIT, pronto, rel_agora(rel));
   processo_init_mem(processo, contr_mmu(self->contr));
   processo_executa(processo, rel_agora(rel), esc_quantum(self->escalonador));
   esc_init(self->escalonador, processo);
@@ -109,7 +111,8 @@ static void so_trata_sisop_cria(so_t *self)
   if (err != ERR_OK) {
     panico(self);
   } else {
-    insere_fila(self->escalonador, processo);
+    //insere_fila(self->escalonador, processo);
+    insereOrdenado_lista(self->escalonador, processo);
   }
 }
 
@@ -157,7 +160,6 @@ void chama_escalonamento(so_t* self, err_t err)
     processo_t* processo = retorna_proximo_pronto(self->escalonador);
     if (processo == NULL) {
       cpue_muda_modo(self->cpue, zumbi, contr_rel(self->contr));
-      mmu_usa_tab_pag(contr_mmu(self->contr), NULL);
     } else {
       cpue_muda_modo(self->cpue, usuario, contr_rel(self->contr));
       processo_executa(processo, rel_agora( contr_rel(self->contr) ), esc_quantum(self->escalonador));
