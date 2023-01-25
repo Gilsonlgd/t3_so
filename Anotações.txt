@@ -10,7 +10,7 @@ PARTE 1:
 - Quando houver troca de processo, altere a tabela a ser usada pela MMU para a tabela do processo que irá executar, não altere a memória. (FEITO)
 
 FAZER:
-- Ajeitar proc_rapido
+- Ajeitar proc_rapido (FEITO)
 - Arrumar alterações do benhur
 
 PARTE 2:
