@@ -45,8 +45,9 @@ contr_t *contr_cria(void)
   t_inicio();
   // cria o controlador de E/S e registra os dispositivos
   self->es = es_cria();
-  es_registra_dispositivo(self->es, 0, self->term, 0, term_le, term_escr, term_pronto);
-  es_registra_dispositivo(self->es, 1, self->term, 1, term_le, term_escr, term_pronto);
+  for (int t=0; t<8; t++) {
+    es_registra_dispositivo(self->es, t, self->term, t, term_le, term_escr, term_pronto);
+  }
   es_registra_dispositivo(self->es, 2, self->rel, 0, rel_le, NULL, NULL);
   es_registra_dispositivo(self->es, 3, self->rel, 1, rel_le, NULL, NULL);
   es_registra_dispositivo(self->es, 4, self->rand, 0, rand_le, NULL, rand_pronto);
