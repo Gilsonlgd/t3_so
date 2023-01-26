@@ -123,11 +123,15 @@ void contr_laco(contr_t *self)
 }
  
 
-static void str_estado(char *txt, exec_t *exec, mmu_t* mmu)
+static void str_estado(char *txt, exec_t *exec, mmu_t *mmu)
 {
   // pega o estado da CPU, imprime registradores, opcode, instrução
   cpu_estado_t *estado = cpue_cria();
   exec_copia_estado(exec, estado);
+  if (cpue_modo(estado) == zumbi) {
+    sprintf(txt, "zumbi");
+    return;
+  }
   int pc, opcode = -1;
   pc = cpue_PC(estado);
   mmu_le(mmu, pc, &opcode);
