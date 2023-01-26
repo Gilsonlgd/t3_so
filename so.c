@@ -1,4 +1,5 @@
 #include "so.h"
+#include "mmu.h"
 #include "tela.h"
 //#include "escalonador_circular.h"
 #include "escalonador_proc_rapido.h"
@@ -33,6 +34,7 @@ so_t *so_cria(contr_t *contr)
   processo_init_mem(processo, contr_mmu(self->contr));
   processo_executa(processo, rel_agora(rel), esc_quantum(self->escalonador));
   esc_init(self->escalonador, processo);
+  mmu_usa_tab_pag(contr_mmu(self->contr), processo_tab_pag(processo));
   // coloca a CPU em modo usuário
   exec_copia_estado(contr_exec(self->contr), self->cpue);
   cpue_muda_modo(self->cpue, usuario, contr_rel(self->contr));
