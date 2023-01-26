@@ -182,6 +182,7 @@ void chama_escalonamento(so_t* self, err_t err)
 // houve uma interrupção do tipo err — trate-a
 void so_int(so_t *self, err_t err)
 {
+  exec_copia_estado(contr_exec(self->contr), self->cpue);
   varre_processos_bloqueados(self->escalonador, self->contr, contr_rel(self->contr));
 
   switch (err) {

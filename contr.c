@@ -48,9 +48,9 @@ contr_t *contr_cria(void)
   for (int t=0; t<8; t++) {
     es_registra_dispositivo(self->es, t, self->term, t, term_le, term_escr, term_pronto);
   }
-  es_registra_dispositivo(self->es, 2, self->rel, 0, rel_le, NULL, NULL);
-  es_registra_dispositivo(self->es, 3, self->rel, 1, rel_le, NULL, NULL);
-  es_registra_dispositivo(self->es, 4, self->rand, 0, rand_le, NULL, rand_pronto);
+  es_registra_dispositivo(self->es, 11, self->rel, 0, rel_le, NULL, NULL);
+  es_registra_dispositivo(self->es, 12, self->rel, 1, rel_le, NULL, NULL);
+  es_registra_dispositivo(self->es, 13, self->rand, 0, rand_le, NULL, rand_pronto);
   // cria a unidade de execução e inicializa com a memória e E/S
   self->exec = exec_cria(self->mmu, self->es);
   self->so = NULL;

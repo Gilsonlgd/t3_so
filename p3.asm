@@ -24,7 +24,7 @@ SO_ESCR define 2
 SO_FIM  define 3
 ; dispositivos de E/S
 TELA    DEFINE 0
-RAND    DEFINE 104
+RAND    DEFINE 113
 
      CARGI 0
      MVAX         ; x=0
