@@ -1,8 +1,8 @@
 |Informacoes do SO:|
-TempoT_exec: 668, Tempo_CPU: 668, Num_Interrup: 295
+TempoT_exec: 439, Tempo_CPU: 439, Num_Interrup: 58
 ----------------------------------------------
 |Metricas dos processos: quantum = 5|
-num:8, tempo_retorno: 665, tempo_bloq: 0,
- tempo_exec: 657, tempo_esp: 7593, tempoM_retorno: 345,1363525391,
- num_bloq: 0, num_preemp: 22 
+num:8, tempo_retorno: 436, tempo_bloq: 0,
+ tempo_exec: 417, tempo_esp: 3153, tempoM_retorno: 225,2142791748,
+ num_bloq: 0, num_preemp: 14 
 

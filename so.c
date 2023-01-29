@@ -1,8 +1,8 @@
 #include "so.h"
 #include "mmu.h"
 #include "tela.h"
-//#include "escalonador_circular.h"
-#include "escalonador_proc_rapido.h"
+#include "escalonador_circular.h"
+//#include "escalonador_proc_rapido.h"
 #include "processo.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,8 +13,8 @@ struct so_t {
   contr_t *contr;       // o controlador do hardware
   bool paniquei;        // apareceu alguma situação intratável
   cpu_estado_t *cpue;   // cópia do estado da CPU
-  //esc_circ_t* escalonador;    // tabela de processos
-  esc_rap_t* escalonador;
+  esc_circ_t* escalonador;    // tabela de processos
+  //esc_rap_t* escalonador;
   fifo_t* fifo;
   int num_interrup;
 };
@@ -119,8 +119,8 @@ static void so_trata_sisop_cria(so_t *self)
   if (err != ERR_OK) {
     panico(self);
   } else {
-    //insere_fila(self->escalonador, processo);
-    insereOrdenado_lista(self->escalonador, processo);
+    insere_fila(self->escalonador, processo);
+    //insereOrdenado_lista(self->escalonador, processo);
   }
 }
 
@@ -162,20 +162,17 @@ static void so_trata_faltap(so_t *self)
   int pagina = mmu_ultimo_endereco(mmu) / TAM_PAG;
   int id_quadro = mmu_proxQuadro_livre(mmu);
 
-  if (id_quadro >= 0){
-    mmu_swap_in(mmu, pagina, id_quadro);
-    fifo_insere_pagina(self->fifo, pagina, id_quadro, mmu_tab_pag(mmu));
-  } else {
-    int id_quadro = fifo_prox_pag_quadro(self->fifo);
+  if (id_quadro < 0) {
+    id_quadro = fifo_prox_pag_quadro(self->fifo);
 
     err = mmu_swap_out(mmu, fifo_prox_pag_num(self->fifo), fifo_prox_pag_tab(self->fifo));
     fifo_retira_pagina(self->fifo);
     if (err != ERR_OK) self->paniquei = true;
-
-    err = mmu_swap_in(mmu, pagina, id_quadro);
-    fifo_insere_pagina(self->fifo, pagina, id_quadro, mmu_tab_pag(mmu));
-    if (err != ERR_OK) self->paniquei = true;
   }
+  
+  err = mmu_swap_in(mmu, pagina, id_quadro);
+  fifo_insere_pagina(self->fifo, pagina, id_quadro, mmu_tab_pag(mmu));
+  if (err != ERR_OK) self->paniquei = true;
 }
 
 void chama_escalonamento(so_t* self, err_t err)
@@ -187,7 +184,7 @@ void chama_escalonamento(so_t* self, err_t err)
   if (executando && err == ERR_TIC) return;
   // se tiver processo executando e houve falta de página,
   // não incrementa o pc
-  if(executando && err == ERR_FALPAG) inc = 0;
+  if (executando && err == ERR_FALPAG) inc = 0;
 
   // se n tiver processo executando, então executa!
   if(!executando) {
