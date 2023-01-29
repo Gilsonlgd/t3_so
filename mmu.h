@@ -9,6 +9,7 @@
 #include "err.h"
 #include "mem.h"
 #include "tab_pag.h"
+#include "lru.h"
 // tipo opaco que representa o gerenciador de memória
 typedef struct mmu_t mmu_t;
 
@@ -67,5 +68,6 @@ void mmu_ocupa_quadro(mmu_t* self, int id_quadro);
 void mmu_libera_quadro(mmu_t* self, int id_quadro);
 // retorna a tabela de paginas da mmu
 tab_pag_t* mmu_tab_pag(mmu_t* self);
+lru_t* mmu_lru(mmu_t* self);
 
 #endif // MMU_H

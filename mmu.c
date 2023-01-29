@@ -3,7 +3,7 @@
 #include "tab_pag.h"
 #include "mem.h"
 #include "processo.h"
-#include "escalonador_proc_rapido.h"
+#include "lru.h"
 #include "tela.h"
 #include <stdbool.h>
 #include <stdlib.h>
@@ -15,6 +15,7 @@
 struct mmu_t {
   mem_t *mem;          // a memória física
   tab_pag_t *tab_pag;  // a tabela de páginas
+  lru_t* lru;
   int num_quadros;
   bool* mem_bitmap; //bit map dos quadro da memória principal
   int ultimo_endereco; // o último endereço virtual traduzido pela MMU
@@ -36,6 +37,7 @@ mmu_t *mmu_cria(mem_t *mem)
     self->mem_bitmap = (bool *) malloc(num_quadros * sizeof(bool));
     memset(self->mem_bitmap, 1, num_quadros * sizeof(bool));
     
+    self->lru = lru_cria();
     self->mem = mem;
     self->tab_pag = NULL;
     self->num_quadros = num_quadros;
@@ -46,6 +48,7 @@ mmu_t *mmu_cria(mem_t *mem)
 void mmu_destroi(mmu_t *self)
 {
   if (self != NULL) {
+    lru_destroi(self->lru);
     free(self);
   }
 }
@@ -155,6 +158,10 @@ err_t mmu_le(mmu_t *self, int endereco, int *pvalor)
     return err;
   }
   tab_pag_muda_acessada(self->tab_pag, pagina, true);
+  //t_printf("AQUIII PAG: %d", pagina);
+  lru_imprime(self->lru);
+  //lru_atualiza_pagina(self->lru, pagina);
+  //lru_imprime(self->lru);
   return mem_le(self->mem, end_fis, pvalor);
 }
 
@@ -198,4 +205,9 @@ void mmu_libera_quadro(mmu_t* self, int id_quadro)
 tab_pag_t* mmu_tab_pag(mmu_t* self)
 {
   return self->tab_pag;
+}
+
+lru_t* mmu_lru(mmu_t* self)
+{
+  return self->lru;
 }

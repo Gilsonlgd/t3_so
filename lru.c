@@ -87,41 +87,29 @@ void lru_retira_pagina(lru_t* self)
 }
 
 void lru_atualiza_pagina(lru_t* self, int num_pagina) {
-    pagina_t** head = &self->head;
-    pagina_t* atual = *head;
+    pagina_t* atual = self->head;
     pagina_t* anterior = NULL;
-
-    while(atual != NULL && atual->num != num_pagina) {
-        anterior = atual;
-        atual = atual->next;
-    }
-
-    if(atual == NULL) {
-        return;
-    }
-
-    if(anterior != NULL) {
-        anterior->next = atual->next;
-    } else {
-        if(atual->next == NULL) {
-            self->last = NULL;
-            *head = NULL;
-            return;
+    pagina_t* temp = NULL;
+    while (atual != NULL) {
+        if (atual->num == num_pagina) {
+            self->num_pags--;
+            if (anterior != NULL) {
+                anterior->next = atual->next;
+            } else {
+                self->head = atual->next;
+                self->last = atual->next;
+            }
+            temp = atual;
+            break;
+        } else {
+            anterior = atual;
+            atual = atual->next;
         }
-        *head = atual->next;
     }
-
-    if(self->last != NULL) {
-        self->last->next = atual;
-    }
-
-    if(self->head == NULL) {
-        self->head = atual;
-    }
-
-    atual->next = NULL;
-    self->last = atual;
+    
 }
+
+
 
 
 int lru_prox_pag_num(lru_t* self)

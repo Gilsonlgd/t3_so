@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -g -Wall -Werror
 LDLIBS = -lcurses
 
-OBJS = exec.o cpu_estado.o es.o mem.o rel.o term.o instr.o err.o processo.o fifo.o\
+OBJS = exec.o cpu_estado.o es.o mem.o rel.o term.o instr.o err.o processo.o lru.o\
 			 tela.o contr.o so.o mmu.o tab_pag.o teste.o rand.o escalonador_circular.o
 OBJS_MONT = instr.o err.o montador.o
 MAQS = ex1.maq ex2.maq ex3.maq ex4.maq ex5.maq init.maq p1.maq p2.maq p3.maq a1.maq \
