@@ -25,13 +25,13 @@ typedef enum {
 processo_t *processo_cria(int num, processo_estado_t estado, int agora);
 
 //inicia a memória do processo quando criado
-err_t processo_init_mem(processo_t *self, mmu_t* mmu);
+err_t processo_init_mem(processo_t *self);
 
-// faz o que o nome diz, apenas delegando a localização das páginas na memóri
-void processo_init_tab_pag(processo_t* self, mmu_t* mmu, int tam_progr);
+// faz o que o nome diz, apenas delegando a localização das páginas na memória
+void processo_init_tab_pag(processo_t* self, int tam_progr);
 
 // transfere o .maq para a memória do progrma 
-err_t transf_mem(processo_t *self, mmu_t* mmu, int* progr, int tam_progr);
+err_t transf_mem(processo_t *self, int* progr, int tam_progr);
 
 void processo_destroi(processo_t* self, mmu_t* mmu, int agora);
 

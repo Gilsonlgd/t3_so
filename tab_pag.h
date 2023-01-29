@@ -6,7 +6,10 @@
 //   virtual em físico
 
 #include "err.h"
+#include "mem.h"
 #include <stdbool.h>
+
+#define MEM_SEC_TAM 1000 
 
 // tipo opaco que representa a tabela de páginas
 typedef struct tab_pag_t tab_pag_t;
@@ -14,7 +17,7 @@ typedef struct tab_pag_t tab_pag_t;
 // cria uma tabela de páginas com suporte a 'num_pag' páginas
 //   de tamanho 'tam_pag' cada
 // retorna NULL em caso de erro
-tab_pag_t *tab_pag_cria(int num_pag, int tam_pag);
+tab_pag_t *tab_pag_cria(int num_pag, int tam_pag, int processo, int mem_sec_tam);
 
 // destrói um tabela de páginas
 // nenhuma outra operação pode ser realizada na tabela após esta chamada
@@ -29,13 +32,17 @@ void tab_pag_destroi(tab_pag_t *self);
 //   e se a tradução foi OK, o quadro em *pquadro
 err_t tab_pag_traduz(tab_pag_t *self, int end_v,
                      int *pend_f, int *ppag, int *pdesl, int *pquadro);
+mem_t* tab_pag_mem_sec(tab_pag_t* self);
 
 int tab_pag_num_pags(tab_pag_t *self);
 // obtém informação sobre uma página da tabela
 bool tab_pag_valida(tab_pag_t *self, int pag);
+bool* tab_pag_valida_ptr(tab_pag_t *self, int pag);
 int tab_pag_quadro(tab_pag_t *self, int pag);
 bool tab_pag_acessada(tab_pag_t *self, int pag);
 bool tab_pag_alterada(tab_pag_t *self, int pag);
+int tab_pag_processo(tab_pag_t* self);
+
 
 // altera informação sobre uma página da tabela
 void tab_pag_muda_valida(tab_pag_t *self, int pag, bool val);

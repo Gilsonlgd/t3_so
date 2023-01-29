@@ -39,7 +39,7 @@ processo_t *processo_cria(int num, processo_estado_t estado, int agora)
     return self;
 }
 
-err_t processo_init_mem(processo_t *self, mmu_t* mmu)
+err_t processo_init_mem(processo_t *self)
 {
     int num = self->num;
     int tam_progr = 0;
@@ -52,87 +52,82 @@ err_t processo_init_mem(processo_t *self, mmu_t* mmu)
             #include "init.maq"
         };
         tam_progr = sizeof(progr0)/sizeof(progr0[0]);
-        return transf_mem(self, mmu, progr0, tam_progr);
+        return transf_mem(self, progr0, tam_progr);
     case 1:
         int progr1[] = {
             #include "p1.maq"
         };
         tam_progr = sizeof(progr1)/sizeof(progr1[0]);
-        return transf_mem(self, mmu, progr1, tam_progr);
+        return transf_mem(self, progr1, tam_progr);
     case 2:
         int progr2[] = {
             #include "p2.maq"
         };
         tam_progr = sizeof(progr2)/sizeof(progr2[0]);
-        return transf_mem(self, mmu, progr2, tam_progr);
+        return transf_mem(self, progr2, tam_progr);
     case 3:
         int progr3[] = {
             #include "p3.maq"
         };
         tam_progr = sizeof(progr3)/sizeof(progr3[0]);
-        return transf_mem(self, mmu, progr3, tam_progr);
+        return transf_mem(self, progr3, tam_progr);
     case 4:
         int progr4[] = {
             #include "a1.maq"
         };
         tam_progr = sizeof(progr4)/sizeof(progr4[0]);
-        return transf_mem(self, mmu, progr4, tam_progr);
+        return transf_mem(self, progr4, tam_progr);
     case 5:
         int progr5[] = {
             #include "peq_cpu.maq"
         };
         tam_progr = sizeof(progr5)/sizeof(progr5[0]);
-        return transf_mem(self, mmu, progr5, tam_progr);
+        return transf_mem(self, progr5, tam_progr);
     case 6:
         int progr6[] = {
             #include "grande_cpu.maq"
         };
         tam_progr = sizeof(progr6)/sizeof(progr6[0]);
-        return transf_mem(self, mmu, progr6, tam_progr);
+        return transf_mem(self, progr6, tam_progr);
     default:
         int* progr = NULL;
-        return transf_mem(self, mmu, progr, tam_progr);
+        return transf_mem(self, progr, tam_progr);
     }
 
 }
 
-void processo_init_tab_pag(processo_t* self, mmu_t* mmu, int tam_progr)
+void processo_init_tab_pag(processo_t* self, int tam_progr)
 {
     int num_pags = tam_progr / TAM_PAG + (tam_progr % TAM_PAG == 0 ? 0 : 1);
-    tab_pag_t* tab_pag = tab_pag_cria(num_pags, TAM_PAG);
+    tab_pag_t* tab_pag = tab_pag_cria(num_pags, TAM_PAG, self->num, MEM_SEC_TAM);
 
     for (int id_pag = 0; id_pag < num_pags; id_pag++) {
-        int id_quadro = mmu_proxQuadro_livre(mmu);
-        if (id_quadro != -1) {
-            tab_pag_muda_quadro(tab_pag, id_pag, id_quadro);
-            tab_pag_muda_valida(tab_pag, id_pag, true);
-            mmu_ocupa_quadro(mmu, id_quadro);
-        } else {
-            break;
-        }
+        int id_quadro = id_pag;
+        
+        tab_pag_muda_quadro(tab_pag, id_pag, id_quadro);
+        tab_pag_muda_valida(tab_pag, id_pag, false);
     }
 
     self->tab_pag = tab_pag; 
 }
 
-err_t transf_mem(processo_t *self, mmu_t* mmu, int* progr, int tam_progr)
-{
+err_t transf_mem(processo_t *self, int* progr, int tam_progr)
+{   
     err_t err = ERR_OK;
-    processo_init_tab_pag(self, mmu, tam_progr);
+    processo_init_tab_pag(self, tam_progr);
 
-    tab_pag_t* tab = mmu_tab_pag(mmu);
-    mmu_usa_tab_pag(mmu, self->tab_pag);
-
-    for (int i = 0; i < tam_progr; i++) {
-        err = mmu_escreve(mmu, i, progr[i]);
-
-        if (err != ERR_OK) {
-            t_printf("processo.transf_mem: problema ao escrever na memoria\n p:%d", self->num);
-            return err;
+    if(progr != NULL) {
+        mem_t *mem = tab_pag_mem_sec(self->tab_pag);
+        for (int i = 0; i < tam_progr; i++) {
+            err = mem_escreve(mem, i, progr[i]);
+            if (err != ERR_OK) {
+                t_printf("processo.transf_mem: erro de memória, endereco %d\n", i);
+                return err;
+            }
         }
+        return ERR_OK;
     }
 
-    mmu_usa_tab_pag(mmu, tab);
     return err;
 }
 
@@ -148,13 +143,30 @@ void processo_destroi(processo_t* self, mmu_t* mmu, int agora)
         
         for (int id_pag = 0; id_pag < num_pag; id_pag++) {
             int id_quadro =  tab_pag_quadro(self->tab_pag, id_pag);
-            mmu_libera_quadro(mmu, id_quadro);
+            if(tab_pag_valida(self->tab_pag, id_pag)) {
+                mmu_libera_quadro(mmu, id_quadro);
+            }
         }
+        mmu_libera_processo(mmu, self->num);
         tab_pag_destroi(self->tab_pag);
         free(self);
     } else {
         t_printf("Erro ao destruir processo");
     }
+}
+
+void processo_finaliza(processo_t* self, mmu_t* mmu, int agora)
+{
+    int num_pag = tab_pag_num_pags(self->tab_pag);
+    for (int id_pag = 0; id_pag < num_pag; id_pag++) {
+        int id_quadro =  tab_pag_quadro(self->tab_pag, id_pag);
+        if (tab_pag_valida(self->tab_pag, id_pag)) {
+            mmu_libera_quadro(mmu, id_quadro);
+        }
+    }
+    mmu_libera_processo(mmu, self->num);
+    tab_pag_destroi(self->tab_pag);
+    self->t_finalizacao = agora;
 }
 
 void processo_executa(processo_t* self, int agora, int quantum) {
@@ -249,17 +261,6 @@ int processo_t_retorno(processo_t* self)
 void processo_muda_estado(processo_t* self, processo_estado_t estado)
 {
     self->estado = estado;
-}
-
-void processo_finaliza(processo_t* self, mmu_t* mmu, int agora)
-{
-    int num_pag = tab_pag_num_pags(self->tab_pag);
-    for (int id_pag = 0; id_pag < num_pag; id_pag++) {
-            int id_quadro =  tab_pag_quadro(self->tab_pag, id_pag);
-            mmu_libera_quadro(mmu, id_quadro);
-        }
-        tab_pag_destroi(self->tab_pag);
-    self->t_finalizacao = agora;
 }
 
 void processo_imprime_metricas(processo_t* self, FILE* arq)

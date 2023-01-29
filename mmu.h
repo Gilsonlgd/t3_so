@@ -15,6 +15,8 @@ typedef struct mmu_t mmu_t;
 #define TAM_QUADRO 10
 #define TAM_PAG 10
 
+
+
 // cria um gerenciador de memória para gerenciar acessos à memória
 //   representada por 'mem'
 // deve receber uma tabela de páginas para poder realizar a conversão
@@ -48,6 +50,14 @@ err_t mmu_le(mmu_t *self, int endereco, int *pvalor);
 //   pela memória se o acesso ao endereço não puder ser feito, ou ERR_OK
 err_t mmu_escreve(mmu_t *self, int endereco, int valor);
 
+err_t mmu_faz_paginacao(mmu_t *self, int pagina);
+
+// transfere uma página da memória secundária para a memória principal 
+err_t transf_pagina(mmu_t* self, int pagina);
+
+// atualiza a página da memória secundária de acordo com a mem principal
+err_t att_mem_sec(mmu_t* self, int pagina, mem_t* mem_sec);
+
 // retorna o último endereço virtual que a MMU traduziu (ou tentou traduzir)
 // função usada pelo SO para obter o endereço que causou falha de página
 int mmu_ultimo_endereco(mmu_t *self);
@@ -57,6 +67,8 @@ int mmu_proxQuadro_livre(mmu_t *self);
 void mmu_ocupa_quadro(mmu_t* self, int id_quadro);
 
 void mmu_libera_quadro(mmu_t* self, int id_quadro);
+
+void mmu_libera_processo(mmu_t* self, int processo);
 
 err_t mmu_escreve_quadro(mmu_t* self, int id_quadro, int* progr, int pag);
 

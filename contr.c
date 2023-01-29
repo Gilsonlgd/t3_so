@@ -14,8 +14,6 @@
 #include <string.h>
 #include <stdio.h>
 
-
-
 struct contr_t {
   mem_t *mem;
   mmu_t *mmu;

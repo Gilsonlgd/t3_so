@@ -1,4 +1,6 @@
 #include "tab_pag.h"
+#include "mem.h"
+#include "tela.h"
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -12,16 +14,21 @@ typedef struct {
 struct tab_pag_t {
   int num_pag;
   int tam_pag;
+  int processo;
   descr_pag_t *tab;
+  mem_t* mem_sec;
 };
 
-tab_pag_t *tab_pag_cria(int num_pag, int tam_pag)
+tab_pag_t *tab_pag_cria(int num_pag, int tam_pag, int processo, int mem_sec_tam)
 {
   tab_pag_t *self;
   self = malloc(sizeof(*self));
   if (self != NULL) {
     self->num_pag = num_pag;
     self->tam_pag = tam_pag;
+    self->processo = processo;
+    self->mem_sec = mem_cria(mem_sec_tam);
+
     // calloc zera a memória, os descritores terão 'false' em 'valida'
     self->tab = calloc(num_pag, sizeof(descr_pag_t));
     if (self->tab == NULL) {
@@ -45,6 +52,7 @@ err_t tab_pag_traduz(tab_pag_t *self, int end_v,
 {
   int pagina = end_v / self->tam_pag;
   int deslocamento = end_v % self->tam_pag;
+  //t_printf("DENTRO DA TAB proc: %d, pag: %d, valida: %d\n", self->processo, pagina, self->tab[pagina].valida);
   if (ppag != NULL) {
     *ppag = pagina;
   }
@@ -67,6 +75,11 @@ err_t tab_pag_traduz(tab_pag_t *self, int end_v,
   return ERR_OK;
 }
 
+mem_t* tab_pag_mem_sec(tab_pag_t* self)
+{
+  return self->mem_sec;
+}
+
 int tab_pag_num_pags(tab_pag_t *self)
 {
   return self->num_pag;
@@ -75,6 +88,11 @@ int tab_pag_num_pags(tab_pag_t *self)
 bool tab_pag_valida(tab_pag_t *self, int pag)
 {
   return self->tab[pag].valida;
+}
+
+bool* tab_pag_valida_ptr(tab_pag_t *self, int pag)
+{
+  return &self->tab[pag].valida;
 }
 
 
@@ -94,6 +112,13 @@ bool tab_pag_alterada(tab_pag_t *self, int pag)
 {
   return self->tab[pag].alterada;
 }
+
+int tab_pag_processo(tab_pag_t* self)
+{
+  return self->processo;
+}
+
+
 
 
 

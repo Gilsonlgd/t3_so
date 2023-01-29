@@ -31,7 +31,7 @@ so_t *so_cria(contr_t *contr)
   self->cpue = cpue_cria();
   //Cria o primeiro processo
   processo_t* processo = processo_cria(SO_INIT, pronto, rel_agora(rel));
-  processo_init_mem(processo, contr_mmu(self->contr));
+  processo_init_mem(processo);
   processo_executa(processo, rel_agora(rel), esc_quantum(self->escalonador));
   esc_init(self->escalonador, processo);
   mmu_usa_tab_pag(contr_mmu(self->contr), processo_tab_pag(processo));
@@ -108,7 +108,7 @@ static void so_trata_sisop_cria(so_t *self)
 {
   processo_t* processo = processo_cria(cpue_A(self->cpue), pronto, rel_agora( contr_rel(self->contr) ));
   // inicia o a tabela de páginas e insere o processo na mem
-  err_t err = processo_init_mem(processo, contr_mmu(self->contr));
+  err_t err = processo_init_mem(processo);
   
   if (err != ERR_OK) {
     panico(self);
@@ -149,6 +149,13 @@ static void so_trata_tic(so_t *self)
   esc_check_quantum(self->escalonador, contr_mmu(self->contr), self->cpue, contr_rel(self->contr));
 }
 
+static void so_trata_faltap(so_t *self)
+{
+  mmu_t* mmu = contr_mmu(self->contr);
+  int pagina = mmu_ultimo_endereco(mmu) / TAM_PAG;
+  mmu_faz_paginacao(mmu, pagina);
+}
+
 void chama_escalonamento(so_t* self, err_t err)
 {
   bool executando = tem_processo_executando(self->escalonador);
@@ -156,6 +163,9 @@ void chama_escalonamento(so_t* self, err_t err)
   // se tem processo executando e não é chamada de sistema
   // não faz nada
   if (executando && err == ERR_TIC) return;
+  // se tiver processo executando e houve falta de página,
+  // não incrementa o pc
+  if(executando && err == ERR_FALPAG) inc = 0;
 
   // se n tiver processo executando, então executa!
   if(!executando) {
@@ -191,6 +201,9 @@ void so_int(so_t *self, err_t err)
       break;
     case ERR_TIC:
       so_trata_tic(self);
+      break;
+    case ERR_FALPAG:
+      so_trata_faltap(self);
       break;
     default:
       t_printf("SO: interrupção não tratada [%s]", err_nome(err));

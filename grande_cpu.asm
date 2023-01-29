@@ -9,8 +9,8 @@ SO_FIM  define 3
 TELA    DEFINE 4
 RANDOM  DEFINE 113 ; altere para o seu dispositivo de números aleatórios
 
-TAMANHO DEFINE 20 ; diminui se quiser que o programa não seja tão grande
-TAM_1   DEFINE 19 ; um a menos que o tamanho
+TAMANHO DEFINE 10 ; diminui se quiser que o programa não seja tão grande
+TAM_1   DEFINE 9 ; um a menos que o tamanho
 
 main
         cargi TAMANHO

@@ -13,11 +13,33 @@ FAZER:
 - Ajeitar proc_rapido (FEITO)
 - Arrumar alterações do benhur (FEITO)
 
-PARTE 2:
+PARTE 2: 
 - Implemente memória virtual com tratamento de faltas de página e paginação por demanda.
 - Reduza o tamanho da memória principal para ser bem menor que o necessário para conter todos os processos.
 - Por simplicidade, a memória secundária de cada processo vai ser mantida pelo SO na entrada do processo na tabela de processos.
-- Essa memória é inicializada na criação do processo.
-- Na criação do processo, é criada a tabela de páginas do processo, com todas as páginas marcadas como inválidas, nenhuma delas é colocada na memória principal. 
-- As páginas serão colocadas em quadros da memória principal em resposta a interrupções de falta de página causadas pela execução do processo.
+- Essa memória é inicializada na criação do processo (FEITO)
+- Na criação do processo, é criada a tabela de páginas do processo, com todas as páginas marcadas como inválidas, nenhuma delas é colocada na memória principal. (FEITO)
+- As páginas serão colocadas em quadros da memória principal em resposta a interrupções de falta de página causadas pela execução do processo. (FEITO)
 - Implementar 2 algoritmos de substituição de páginas, e realizar medições para comparar o desempenho do sistema em 4 configurações (cada algoritmo em uma situação folgada (metade da memória necessária) ou apertada (menos de 1/5 da memória)).
+- O processo tem sua própria memória dnv (FEITO)
+
+Algumas obs:
+- Cada processo tem uma tabela de paginas. (FEITO)
+- Quando inicia ele, copia a tab pra mmu. (FEITO)
+- Nesse momento tá tudo inválido, ou seja nenhuma página tá na mem principal. (OK)
+- Implementar uma tabela de páginas pro processo e outra pra mmu.
+- 
+- Se a mmu tentou acessar uma página inválida, procura ela na memória do processo.
+- Copia o quadro que ela ref pra mem principal
+- Coloca ela como válida
+
+Se tá cheio:
+- Aí entra o algoritmo de troca. 
+- Ele que decide qual página sai.
+
+- Podemos implementar o FIFO (colocamos as páginas em uma fila, primeira que entra, primeira sai)
+
+- Podemos implementar o NRU (contamos o numero de acessos por página, a que for menos acessada sai pra outra entrar)
+
+
+- Problema parece estar em chamadas do tipo cargm e armm
