@@ -75,17 +75,19 @@ int processo_num(processo_t* self) ;
 //retorna o dispositivo que causou o último bloqueio do processo
 int processo_disp(processo_t* processo);
 
+//retorna o quantum atual do processo;
 int processo_quantum(processo_t* processo);
 
+// muda o estado do processo para o estado apontado
 void processo_muda_estado(processo_t* self, processo_estado_t estado);
 
-void processo_finaliza(processo_t* self, mmu_t* mmu, int agora);
-
+// metricas de desempenho
 void processo_imprime_metricas(processo_t* self, FILE* arq);
-
 float processo_tmedio_retorno(processo_t* self);
 float processo_tmedio_exec(processo_t* self);
 
+// finaliza, não destroi, utilizado nas métricas tb
+void processo_finaliza(processo_t* self, mmu_t* mmu, int agora);
 
 
 #endif
