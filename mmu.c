@@ -99,7 +99,6 @@ err_t att_mem_sec(mmu_t* self, int pagina, mem_t* mem_sec)
 
 err_t transf_pagina(mmu_t* self, int pagina)
 {
-  // ATENÇÃO: aqui dá pra melhorar usando o self.ultimo endereço
   mem_t* mem_sec = tab_pag_mem_sec(self->tab_pag);
   err_t err = ERR_OK;
   // lembrando que na mem virtual pag_num = quadro_num
@@ -139,10 +138,8 @@ err_t mmu_faz_paginacao(mmu_t *self, int pagina)
     int old_pag = fifo_prox_pag_num(self->fifo);
     id_quadro = fifo_prox_pag_quadro(self->fifo);
     err = att_mem_sec(self, old_pag, fifo_prox_pag_mem(self->fifo));
-
-    if(err == ERR_FALPAG) t_printf("FALTA PAGINA num: %d proc = %d \n", pagina, fifo_prox_pag_processo(self->fifo));
     fifo_retira_pagina(self->fifo);
-
+    
     tab_pag_muda_quadro(self->tab_pag, pagina, id_quadro);
     err = transf_pagina(self, pagina);  
   }
@@ -150,9 +147,6 @@ err_t mmu_faz_paginacao(mmu_t *self, int pagina)
   bool* valida_ptr = tab_pag_valida_ptr(self->tab_pag, pagina);
   mem_t* mem_ptr = tab_pag_mem_sec(self->tab_pag);
   fifo_insere_pagina(self->fifo, pagina, tab_pag_processo(self->tab_pag), id_quadro, valida_ptr, mem_ptr, mmu_tab_pag(self));
-  
-  t_printf("AQUI:\n");
-  fifo_imprime(self->fifo);
 
   return err;
 }
@@ -205,26 +199,6 @@ void mmu_ocupa_quadro(mmu_t* self, int id_quadro)
 void mmu_libera_quadro(mmu_t* self, int id_quadro)
 {
   self->mem_bitmap[id_quadro] = true;
-}
-
-// ATENÇÃO
-// talve não use pra nada
-err_t mmu_escreve_quadro(mmu_t* self, int id_quadro, int* progr, int pag)
-{
-  err_t err = ERR_OK;
-  int inicio_quadro = id_quadro * TAM_QUADRO;
-  int fim_quadro = inicio_quadro + TAM_PAG;
-
-  int p_pagina = pag * TAM_PAG;
-
-  for (int i = inicio_quadro; i < fim_quadro; i++, p_pagina++) {
-    err = mem_escreve(self->mem, i, progr[p_pagina]);
-    if (err != ERR_OK) {
-      t_printf("mmu.escreve_quadro: problema ao escrever mem. Pos: %d", i);
-      return err;
-    }
-  }
-  return err;
 }
 
 void mmu_libera_processo(mmu_t* self, int processo)
