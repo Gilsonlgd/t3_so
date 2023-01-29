@@ -11,9 +11,7 @@ struct pagina_t {
     int num;
     int processo_num;
     int quadro_num;
-    bool* valida_ptr;
     tab_pag_t* tab_pag;;
-    mem_t* mem_ptr;
     pagina_t* next;
 };
 
@@ -22,6 +20,8 @@ struct fifo_t {
     pagina_t* head;
     pagina_t* last;
 };
+
+static pagina_t* fifo_cria_no(int num, int processo_num, int quadro, tab_pag_t* tab);
 
 fifo_t* fifo_cria()
 {
@@ -39,15 +39,13 @@ void fifo_destroi(fifo_t* self)
     else t_printf("ERRO: a fifo já foi destruida\n");
 }
 
-pagina_t* fifo_cria_no(int num, int processo_num, int quadro, bool* valida_ptr, mem_t* mem_ptr, tab_pag_t* tab) 
+static pagina_t* fifo_cria_no(int num, int processo_num, int quadro, tab_pag_t* tab) 
 {
     pagina_t* self = malloc(sizeof(pagina_t));
     if(self != NULL) {
         self->num = num;
         self->processo_num = processo_num;
         self->quadro_num = quadro;
-        self->mem_ptr = mem_ptr;
-        self->valida_ptr = valida_ptr;
         self->tab_pag = tab;
         self->next = NULL;
         return self;
@@ -57,10 +55,11 @@ pagina_t* fifo_cria_no(int num, int processo_num, int quadro, bool* valida_ptr, 
     }
 }
 
-void fifo_insere_pagina(fifo_t* self, int num, int num_processo, int quadro, bool* valida_ptr, mem_t* mem_ptr, tab_pag_t* tab)
+void fifo_insere_pagina(fifo_t* self, int num, int quadro, tab_pag_t* tab)
 {
+    int num_processo = tab_pag_processo(tab);
     pagina_t** last = &self->last;
-    pagina_t* novo_no = fifo_cria_no(num, num_processo, quadro, valida_ptr, mem_ptr, tab);
+    pagina_t* novo_no = fifo_cria_no(num, num_processo, quadro, tab);
     if(*last == NULL) {
         *last = novo_no;
         pagina_t** head = &self->head;
@@ -78,10 +77,6 @@ void fifo_retira_pagina(fifo_t* self)
     if (*head == NULL) {
         t_printf("A fifo ja estah vazia");
         return;
-    }
-    bool* valida_ptr = (*head)->valida_ptr;
-    if (valida_ptr != NULL) {
-        *valida_ptr = false;
     }
 
     pagina_t* new_head = (*head)->next;
@@ -109,11 +104,6 @@ int fifo_prox_pag_quadro(fifo_t* self)
 tab_pag_t* fifo_prox_pag_tab(fifo_t* self)
 {
     return self->head->tab_pag;
-}
-
-mem_t* fifo_prox_pag_mem(fifo_t* self)
-{
-    return self->head->mem_ptr;
 }
 
 bool fifo_vazia(fifo_t* self)

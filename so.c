@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "rel.h"
+#include "mmu_fifo.h"
 
 struct so_t {
   contr_t *contr;       // o controlador do hardware
@@ -14,6 +15,7 @@ struct so_t {
   cpu_estado_t *cpue;   // cópia do estado da CPU
   //esc_circ_t* escalonador;    // tabela de processos
   esc_rap_t* escalonador;
+  fifo_t* fifo;
   int num_interrup;
 };
 
@@ -29,6 +31,7 @@ so_t *so_cria(contr_t *contr)
   self->contr = contr;
   self->paniquei = false;
   self->cpue = cpue_cria();
+  self->fifo = fifo_cria();
   //Cria o primeiro processo
   processo_t* processo = processo_cria(SO_INIT, pronto, rel_agora(rel));
   processo_init_mem(processo);
@@ -96,7 +99,10 @@ static void so_trata_sisop_escr(so_t *self)
 // chamada de sistema para término do processo
 static void so_trata_sisop_fim(so_t *self)
 {
+  processo_t* processo = esc_processo_executando(self->escalonador);
   err_t err = finaliza_processo_em_exec(self->escalonador, contr_mmu(self->contr), contr_rel(self->contr));
+  fifo_liberaPags_processo(self->fifo, processo_num(processo));
+
   if(err != ERR_OK) {
     t_printf("Erro na finalizacao do processo.");
     self->paniquei = true;
@@ -152,8 +158,24 @@ static void so_trata_tic(so_t *self)
 static void so_trata_faltap(so_t *self)
 {
   mmu_t* mmu = contr_mmu(self->contr);
+  err_t err = ERR_OK;
   int pagina = mmu_ultimo_endereco(mmu) / TAM_PAG;
-  mmu_faz_paginacao(mmu, pagina);
+  int id_quadro = mmu_proxQuadro_livre(mmu);
+
+  if (id_quadro >= 0){
+    mmu_swap_in(mmu, pagina, id_quadro);
+    fifo_insere_pagina(self->fifo, pagina, id_quadro, mmu_tab_pag(mmu));
+  } else {
+    int id_quadro = fifo_prox_pag_quadro(self->fifo);
+    
+    err = mmu_swap_out(mmu, fifo_prox_pag_num(self->fifo), fifo_prox_pag_tab(self->fifo));
+    fifo_retira_pagina(self->fifo);
+    if (err != ERR_OK) self->paniquei = true;
+
+    err = mmu_swap_in(mmu, pagina, id_quadro);
+    fifo_insere_pagina(self->fifo, pagina, id_quadro, mmu_tab_pag(mmu));
+    if (err != ERR_OK) self->paniquei = true;
+  }
 }
 
 void chama_escalonamento(so_t* self, err_t err)

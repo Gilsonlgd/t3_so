@@ -52,6 +52,9 @@ err_t mmu_escreve(mmu_t *self, int endereco, int valor);
 
 err_t mmu_faz_paginacao(mmu_t *self, int pagina);
 
+err_t mmu_swap_out(mmu_t *self, int pagina, tab_pag_t* tab);
+err_t mmu_swap_in(mmu_t* self, int pagina, int id_quadro);
+
 // transfere uma página da memória secundária para a memória principal 
 err_t transf_pagina(mmu_t* self, int pagina);
 
@@ -68,7 +71,7 @@ void mmu_ocupa_quadro(mmu_t* self, int id_quadro);
 
 void mmu_libera_quadro(mmu_t* self, int id_quadro);
 
-void mmu_libera_processo(mmu_t* self, int processo);
+//void mmu_libera_processo(mmu_t* self, int processo);
 
 err_t mmu_escreve_quadro(mmu_t* self, int id_quadro, int* progr, int pag);
 

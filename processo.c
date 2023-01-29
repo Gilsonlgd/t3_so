@@ -147,7 +147,6 @@ void processo_destroi(processo_t* self, mmu_t* mmu, int agora)
                 mmu_libera_quadro(mmu, id_quadro);
             }
         }
-        mmu_libera_processo(mmu, self->num);
         tab_pag_destroi(self->tab_pag);
         free(self);
     } else {
@@ -164,7 +163,6 @@ void processo_finaliza(processo_t* self, mmu_t* mmu, int agora)
             mmu_libera_quadro(mmu, id_quadro);
         }
     }
-    mmu_libera_processo(mmu, self->num);
     tab_pag_destroi(self->tab_pag);
     self->t_finalizacao = agora;
 }
