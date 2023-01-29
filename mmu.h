@@ -15,8 +15,6 @@ typedef struct mmu_t mmu_t;
 #define TAM_QUADRO 10
 #define TAM_PAG 10
 
-
-
 // cria um gerenciador de memória para gerenciar acessos à memória
 //   representada por 'mem'
 // deve receber uma tabela de páginas para poder realizar a conversão
@@ -50,33 +48,24 @@ err_t mmu_le(mmu_t *self, int endereco, int *pvalor);
 //   pela memória se o acesso ao endereço não puder ser feito, ou ERR_OK
 err_t mmu_escreve(mmu_t *self, int endereco, int valor);
 
-err_t mmu_faz_paginacao(mmu_t *self, int pagina);
-
+// faz entrada e saída de páginas na memória
+// coloquei o nome em inglês pq procurei pelo termo correto e achei isso
+// **mais bonito**
 err_t mmu_swap_out(mmu_t *self, int pagina, tab_pag_t* tab);
 err_t mmu_swap_in(mmu_t* self, int pagina, int id_quadro);
-
-// transfere uma página da memória secundária para a memória principal 
-err_t transf_pagina(mmu_t* self, int pagina);
-
-// atualiza a página da memória secundária de acordo com a mem principal
-err_t att_mem_sec(mmu_t* self, int pagina, mem_t* mem_sec);
 
 // retorna o último endereço virtual que a MMU traduziu (ou tentou traduzir)
 // função usada pelo SO para obter o endereço que causou falha de página
 int mmu_ultimo_endereco(mmu_t *self);
 
+// retorna o id do próximo quadro livre na memória
 int mmu_proxQuadro_livre(mmu_t *self);
 
+// marca o quadro recebido como ocupado
 void mmu_ocupa_quadro(mmu_t* self, int id_quadro);
-
+// marca o quadro recebido como desocupado
 void mmu_libera_quadro(mmu_t* self, int id_quadro);
-
-//void mmu_libera_processo(mmu_t* self, int processo);
-
-err_t mmu_escreve_quadro(mmu_t* self, int id_quadro, int* progr, int pag);
-
-mem_t* mmu_mem(mmu_t* self);
-
+// retorna a tabela de paginas da mmu
 tab_pag_t* mmu_tab_pag(mmu_t* self);
 
 #endif // MMU_H

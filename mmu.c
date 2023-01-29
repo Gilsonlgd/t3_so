@@ -16,9 +16,14 @@ struct mmu_t {
   mem_t *mem;          // a memória física
   tab_pag_t *tab_pag;  // a tabela de páginas
   int num_quadros;
-  bool* mem_bitmap;
+  bool* mem_bitmap; //bit map dos quadro da memória principal
   int ultimo_endereco; // o último endereço virtual traduzido pela MMU
 };
+
+// atualiza a página da memória secundária de acordo com a mem principal
+static err_t att_mem_sec(mmu_t* self, int pagina, mem_t* mem_sec);
+// transfere uma página da memória secundária para a memória principal 
+static err_t transf_pagina(mmu_t* self, int pagina);
 
 mmu_t *mmu_cria(mem_t *mem)
 {
@@ -63,7 +68,7 @@ static err_t traduz_endereco(mmu_t *self, int end_v, int *end_f,
   return tab_pag_traduz(self->tab_pag, end_v, end_f, ppag, pdesl, pquadro);
 }
 
-err_t att_mem_sec(mmu_t* self, int pagina, mem_t* mem_sec)
+static err_t att_mem_sec(mmu_t* self, int pagina, mem_t* mem_sec)
 {
   err_t err = ERR_OK;
   // lembrando que na mem virtual pag_num = quadro_num
@@ -88,7 +93,7 @@ err_t att_mem_sec(mmu_t* self, int pagina, mem_t* mem_sec)
 
 }
 
-err_t transf_pagina(mmu_t* self, int pagina)
+static err_t transf_pagina(mmu_t* self, int pagina)
 {
   mem_t* mem_sec = tab_pag_mem_sec(self->tab_pag);
   err_t err = ERR_OK;
@@ -139,35 +144,6 @@ err_t mmu_swap_out(mmu_t *self, int pagina, tab_pag_t* tab)
   return err;
 }
 
-/*err_t mmu_faz_paginacao(mmu_t *self, int pagina)
-{
-  err_t err = ERR_OK;
-  int id_quadro = -1;
-  tab_pag_muda_valida(self->tab_pag, pagina, true);
-  tab_pag_muda_acessada(self->tab_pag, pagina, false);
-  
-  if (!tabela_cheia(self)){
-    id_quadro = mmu_proxQuadro_livre(self);
-    mmu_ocupa_quadro(self, id_quadro);
-    tab_pag_muda_quadro(self->tab_pag, pagina, id_quadro);
-    err = transf_pagina(self, pagina);
-  } else {
-    int old_pag = fifo_prox_pag_num(self->fifo);
-    id_quadro = fifo_prox_pag_quadro(self->fifo);
-    err = att_mem_sec(self, old_pag, fifo_prox_pag_mem(self->fifo));
-    fifo_retira_pagina(self->fifo);
-    
-    tab_pag_muda_quadro(self->tab_pag, pagina, id_quadro);
-    err = transf_pagina(self, pagina);  
-  }
-
-  bool* valida_ptr = tab_pag_valida_ptr(self->tab_pag, pagina);
-  mem_t* mem_ptr = tab_pag_mem_sec(self->tab_pag);
-  fifo_insere_pagina(self->fifo, pagina, tab_pag_processo(self->tab_pag), id_quadro, valida_ptr, mem_ptr, mmu_tab_pag(self));
-
-  return err;
-}*/
-
 err_t mmu_le(mmu_t *self, int endereco, int *pvalor)
 {
   int end_fis;
@@ -217,24 +193,7 @@ void mmu_libera_quadro(mmu_t* self, int id_quadro)
   self->mem_bitmap[id_quadro] = true;
 }
 
-/*void mmu_libera_processo(mmu_t* self, int processo)
-{
-  fifo_liberaPags_processo(self->fifo, processo);
-}*/
-
-mem_t* mmu_mem(mmu_t* self)
-{
-  return self->mem;
-}
-
 tab_pag_t* mmu_tab_pag(mmu_t* self)
 {
   return self->tab_pag;
 }
-
-/*static bool tabela_cheia(mmu_t* self)
-{
-  int num_max_pags = self->num_quadros;
-  if (fifo_num_pags(self->fifo) == num_max_pags) return true;
-  else return false;
-}*/
