@@ -7,7 +7,7 @@ SO_ESCR define 2
 SO_FIM  define 3
 ; dispositivos de E/S
 TELA    DEFINE 0
-RANDOM  DEFINE 10 ; altere para o seu dispositivo de números aleatórios
+RANDOM  DEFINE 103 ; altere para o seu dispositivo de números aleatórios
 
 TAMANHO DEFINE 5
 TAM_1   DEFINE 4 ; um a menos que o tamanho
