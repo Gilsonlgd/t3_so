@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "rel.h"
-#include "mmu_fifo.h"
+#include "fifo.h"
 
 struct so_t {
   contr_t *contr;       // o controlador do hardware
@@ -167,7 +167,7 @@ static void so_trata_faltap(so_t *self)
     fifo_insere_pagina(self->fifo, pagina, id_quadro, mmu_tab_pag(mmu));
   } else {
     int id_quadro = fifo_prox_pag_quadro(self->fifo);
-    
+
     err = mmu_swap_out(mmu, fifo_prox_pag_num(self->fifo), fifo_prox_pag_tab(self->fifo));
     fifo_retira_pagina(self->fifo);
     if (err != ERR_OK) self->paniquei = true;

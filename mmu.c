@@ -88,9 +88,7 @@ static err_t att_mem_sec(mmu_t* self, int pagina, mem_t* mem_sec)
       return err;
     }
   }
-  tab_pag_muda_alterada(self->tab_pag, pagina, false);
   return err;
-
 }
 
 static err_t transf_pagina(mmu_t* self, int pagina)
@@ -123,6 +121,7 @@ err_t mmu_swap_in(mmu_t* self, int pagina, int id_quadro)
   err_t err = ERR_OK;
   tab_pag_muda_valida(self->tab_pag, pagina, true);
   tab_pag_muda_acessada(self->tab_pag, pagina, false);
+  tab_pag_muda_alterada(self->tab_pag, pagina, false);
 
   mmu_ocupa_quadro(self, id_quadro);
   tab_pag_muda_quadro(self->tab_pag, pagina, id_quadro);
@@ -133,12 +132,15 @@ err_t mmu_swap_in(mmu_t* self, int pagina, int id_quadro)
 
 err_t mmu_swap_out(mmu_t *self, int pagina, tab_pag_t* tab)
 {
+  err_t err = ERR_OK;
   tab_pag_t* tab_atual = mmu_tab_pag(self);
   mmu_usa_tab_pag(self, tab);
 
-  err_t err = att_mem_sec(self, pagina, tab_pag_mem_sec(self->tab_pag));
-  tab_pag_muda_valida(self->tab_pag, pagina, false);
-  tab_pag_muda_alterada(self->tab_pag, pagina, false);
+  if(tab_pag_alterada(mmu_tab_pag(self), pagina)) {
+    err = att_mem_sec(self, pagina, tab_pag_mem_sec(self->tab_pag));
+    tab_pag_muda_valida(self->tab_pag, pagina, false);
+    tab_pag_muda_alterada(self->tab_pag, pagina, false);
+  }
 
   mmu_usa_tab_pag(self, tab_atual);
   return err;

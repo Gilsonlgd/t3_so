@@ -4,7 +4,7 @@
 #include "err.h"
 #include "mem.h"
 #include "tab_pag.h"
-#include "mmu_fifo.h"
+#include "fifo.h"
 #include "tela.h"
 
 struct pagina_t {

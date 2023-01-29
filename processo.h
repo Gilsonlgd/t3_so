@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "mem.h"
 #include "cpu_estado.h"
 #include "es.h"
 #include "tab_pag.h"
