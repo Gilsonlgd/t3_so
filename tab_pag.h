@@ -32,8 +32,11 @@ void tab_pag_destroi(tab_pag_t *self);
 //   e se a tradução foi OK, o quadro em *pquadro
 err_t tab_pag_traduz(tab_pag_t *self, int end_v,
                      int *pend_f, int *ppag, int *pdesl, int *pquadro);
+
+// retorna o ponteiro para a memória secundária do processo ao qual a tabela pertence.                     
 mem_t* tab_pag_mem_sec(tab_pag_t* self);
 
+// retorna o numero de páginas da tabela
 int tab_pag_num_pags(tab_pag_t *self);
 // obtém informação sobre uma página da tabela
 bool tab_pag_valida(tab_pag_t *self, int pag);

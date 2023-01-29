@@ -16,8 +16,8 @@ struct tab_pag_t {
   int tam_pag;
   int processo;
   descr_pag_t *tab;
-  mem_t* mem_sec;
-};
+  mem_t* mem_sec; // agora é a tabela de página que
+};                //armazena o ponteiro para a mem do processo
 
 tab_pag_t *tab_pag_cria(int num_pag, int tam_pag, int processo, int mem_sec_tam)
 {
@@ -52,7 +52,6 @@ err_t tab_pag_traduz(tab_pag_t *self, int end_v,
 {
   int pagina = end_v / self->tam_pag;
   int deslocamento = end_v % self->tam_pag;
-  //t_printf("DENTRO DA TAB proc: %d, pag: %d, valida: %d\n", self->processo, pagina, self->tab[pagina].valida);
   if (ppag != NULL) {
     *ppag = pagina;
   }
@@ -90,23 +89,15 @@ bool tab_pag_valida(tab_pag_t *self, int pag)
   return self->tab[pag].valida;
 }
 
-bool* tab_pag_valida_ptr(tab_pag_t *self, int pag)
-{
-  return &self->tab[pag].valida;
-}
-
-
 int tab_pag_quadro(tab_pag_t *self, int pag)
 {
   return self->tab[pag].quadro;
 }
 
-
 bool tab_pag_acessada(tab_pag_t *self, int pag)
 {
   return self->tab[pag].acessada;
 }
-
 
 bool tab_pag_alterada(tab_pag_t *self, int pag)
 {
@@ -117,9 +108,6 @@ int tab_pag_processo(tab_pag_t* self)
 {
   return self->processo;
 }
-
-
-
 
 
 // altera informação sobre uma página da tabela
