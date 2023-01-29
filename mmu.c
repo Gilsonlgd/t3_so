@@ -20,7 +20,7 @@ struct mmu_t {
   int ultimo_endereco; // o último endereço virtual traduzido pela MMU
 };
 
-// atualiza a página da memória secundária de acordo com a mem principa
+// atualiza a página da memória secundária de acordo com a mem principal
 static err_t att_mem_sec(mmu_t* self, int pagina, mem_t* mem_sec);
 // transfere uma página da memória secundária para a memória principal 
 static err_t transf_pagina(mmu_t* self, int pagina);
