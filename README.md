@@ -1,54 +1,66 @@
-## t3 — Memória Virtual
+## T3 — Memória Virtual - FIFO (First In First Out)
+- Esta versão do trabalho 3 corresponde a parte 2 solicitada, onde se implementa um algoritmo de substituição de página.  
+- O algoritmo escolhido foi o FIFO, que retira da memória a página que está há mais tempo lá.  
+- Foi utilizada uma fila para implementação. Uma página é inserida no final da fila.
+- A página a ser retirada é a primeira da fila.
 
-Implemente um sistema simples de paginação.
+### Métricas:
+#### Programa focado em CPU:
+```
+MEMÓRIA FOLGADA: 200
+|Informacoes do SO:|
+TempoT_exec: 1881, Tempo_CPU: 1881, Num_Interrup: 154
+----------------------------------------------
+|Metricas dos processos: quantum = 5|
+num:6, tempo_retorno: 1878, tempo_bloq: 0,
+ tempo_exec: 1348, tempo_esp: 50152, tempoM_retorno: 1114,4888916016,
+ num_bloq: 0, num_preemp: 45 
 
-### Alterações na implementação em relação ao t1
+num:5, tempo_retorno: 1053, tempo_bloq: 0,
+ tempo_exec: 510, tempo_esp: 9810, tempoM_retorno: 577,0588378906,
+ num_bloq: 0, num_preemp: 17 
 
-Foram adicionados os seguintes arquivos:
-- `mmu.h` e `mmu.c` — implementação da unidade de gerenciamento de memória. Tem uma API semelhante à da memória.
-- `tab_pag.h` e `tab_tag.c` — implementa uma tabela de páginas; usada pela MMU para fazer a tradução de endereços lógicos em físicos. Deve existir uma dessas por processo, e a MMU deve receber a tabela correta a cada troca de processo.
 
-Foram alterados:
-- `err.h` — adição de dois erros relacionados à tradução de endereços
-- `exec.h` e `exec.c` — acesso à memória via MMU, não mais de forma direta
-- `contr.h` e `contr.c` — inicialização da MMU, alteração na inicialização de exec, API para permitir que o SO acesse a MMU.
+MEMÓRIA PEQUENA: 30
+|Informacoes do SO:|
+TempoT_exec: 2778, Tempo_CPU: 2778, Num_Interrup: 1080
+----------------------------------------------
+|Metricas dos processos: quantum = 5|
+num:6, tempo_retorno: 2775, tempo_bloq: 0,
+ tempo_exec: 2009, tempo_esp: 109501, tempoM_retorno: 1634,3432617188,
+ num_bloq: 0, num_preemp: 67 
 
-Foi adicionado ainda o arquivo `a1.asm`, que preenche um vetor com números aleatórios e ordena os números.
-Esse programa pode ser facilmente alterado para mudar entre um programa que usa bastante CPU e/ou E/S.
-Alterando o valor de TELA, dá para fazer ele usar outro terminal.
-Alterando a forma de obtenção dos números, dá para usar E/S em vez de CPU (trocando "`cargi 1000/chama aleat`" por uma chamada a uma função similar a `le_int` que lê do gerador de números de t0).
-Comentando as chamadas a `imprime_vet`, dá para reduzir a E/S.
-Comentando a chamada a `ordena_vet`, dá para reduzir a CPU.
+num:5, tempo_retorno: 1492, tempo_bloq: 0,
+ tempo_exec: 720, tempo_esp: 18875, tempoM_retorno: 786,4583129883,
+ num_bloq: 0, num_preemp: 24 
+```
+#### Programa focado em E/S:
+```
+MEMÓRIA FOLGADA: 200
+|Informacoes do SO:|
+TempoT_exec: 949, Tempo_CPU: 949, Num_Interrup: 109
+----------------------------------------------
+|Metricas dos processos: quantum = 5|
+num:7, tempo_retorno: 944, tempo_bloq: 0,
+ tempo_exec: 477, tempo_esp: 8623, tempoM_retorno: 538,9375000000,
+ num_bloq: 0, num_preemp: 16 
 
-Foi alterado também `so.c`, para executar `a1.maq` e `tela.c` para aumentar o tamanho das filas de E/S.
+num:8, tempo_retorno: 861, tempo_bloq: 0,
+ tempo_exec: 420, tempo_esp: 6375, tempoM_retorno: 455,3571472168,
+ num_bloq: 0, num_preemp: 14 
 
-### Parte I
 
-Altere a sua implementação de processos para manter todos os processos na memória ao mesmo tempo. 
-A MMU será usada para proteção de memória e relocação, mas ainda não para memória virtual com uso de área de troca.
+MEMÓRIA PEQUENA: 30
+|Informacoes do SO:|
+TempoT_exec: 1452, Tempo_CPU: 1452, Num_Interrup: 629
+----------------------------------------------
+|Metricas dos processos: quantum = 5|
+num:7, tempo_retorno: 1447, tempo_bloq: 0,
+ tempo_exec: 719, tempo_esp: 18816, tempoM_retorno: 784,0000000000,
+ num_bloq: 0, num_preemp: 24 
 
-Defina a memória principal com tamanho suficiente para conter todos os processos que serão executados.
-O tamanho das páginas (e dos quadros) não é especialmente importante, mas deve ser levado em consideração que uma página não pode ser usada por mais de um processo por vez.
-Na criação de um processo, coloque todo o conteúdo dele em uma região livre da memória principal.
-A alocação da memória principal deve ser feita em quadros.
-Crie e inicialize uma tabela de páginas para o processo.
-A página 0 do processo deve corresponder ao primeiro quadro usado para esse processo, a página 1 ao segundo etc.
-Quando houver troca de processo, altere a tabela a ser usada pela MMU para a tabela do processo que irá executar, não altere a memória.
+num:8, tempo_retorno: 1399, tempo_bloq: 0,
+ tempo_exec: 690, tempo_esp: 16680, tempoM_retorno: 725,2174072266,
+ num_bloq: 0, num_preemp: 23  
+```
 
-### Parte II
-
-Foram alterados `mmu.h` e `mmu.c` para incluir a função `mmu_ultimo_endereco`, que o SO pode usar para obter o endereço que causou falha de página.
-
-Implemente memória virtual com tratamento de faltas de página e paginação por demanda.
-Reduza o tamanho da memória principal para ser bem menor que o necessário para conter todos os processos.
-Por simplicidade, a memória secundária de cada processo vai ser mantida pelo SO na entrada do processo na tabela de processos. Essa memória é inicializada na criação do processo.
-
-Na criação do processo, é criada a tabela de páginas do processo, com todas as páginas marcadas como inválidas, nenhuma delas é colocada na memória principal. As páginas serão colocadas em quadros da memória principal em resposta a interrupções de falta de página causadas pela execução do processo.
-
-Você deve implementar 2 algoritmos de substituição de páginas, e realizar medições para comparar o desempenho do sistema em 4 configurações (cada algoritmo em uma situação folgada (metade da memória necessária) ou apertada (menos de 1/5 da memória)).
-
-### Atualizações
-
-Foi corrigido um bug em tab_pag.c (tava invertido o teste de página válida).
-
-Foram acrescentados 4 programas .asm (pequeno e grande, limitado por CPU e limitado por E/S), alterações de a1.asm.
