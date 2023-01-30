@@ -33,7 +33,7 @@ contr_t *contr_cria(void)
 {
   contr_t *self = malloc(sizeof(*self));
   if (self == NULL) return NULL;
-  // cria a memória e a mmu
+  // cria a memória e a mmu 
   self->mem = mem_cria(MEM_TAM);
   self->mmu = mmu_cria(self->mem);
   // cria dispositivos de E/S (o relógio e um terminal)
