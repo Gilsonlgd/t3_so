@@ -161,15 +161,17 @@ static void so_trata_faltap(so_t *self)
   err_t err = ERR_OK;
   int pagina = mmu_ultimo_endereco(mmu) / TAM_PAG;
   int id_quadro = mmu_proxQuadro_livre(mmu);
-
+  
   if (id_quadro < 0) {
     id_quadro = lru_prox_pag_quadro(self->lru);
-
-    err = mmu_swap_out(mmu, lru_prox_pag_num(self->lru), lru_prox_pag_tab(self->lru));
+    int num_pag = lru_prox_pag_num(self->lru);
+    tab_pag_t* tab = lru_prox_pag_tab(self->lru);
     lru_retira_pagina(self->lru);
+
+    err = mmu_swap_out(mmu, num_pag, tab);
     if (err != ERR_OK) self->paniquei = true;
   }
-  
+
   err = mmu_swap_in(mmu, pagina, id_quadro);
   lru_insere_pagina(self->lru, pagina, id_quadro, mmu_tab_pag(mmu));
   if (err != ERR_OK) self->paniquei = true;

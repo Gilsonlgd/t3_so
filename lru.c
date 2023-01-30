@@ -86,31 +86,45 @@ void lru_retira_pagina(lru_t* self)
     self->num_pags--;
 }
 
-void lru_atualiza_pagina(lru_t* self, int num_pagina) {
+void lru_insere_fila(lru_t *self, pagina_t* pagina) {
+    pagina_t** last = &self->last;
+    pagina_t* novo_no = pagina;
+    novo_no->next = NULL;
+
+    if(*last == NULL) {
+        *last = novo_no;
+        pagina_t** head = &self->head;
+        *head = novo_no;
+    } else {
+        (*last)->next = novo_no;
+        *last = novo_no;   
+    }
+}
+
+void lru_atualiza_pagina(lru_t* self, int num_pagina, int quadro) {
+    pagina_t** head = &self->head;
     pagina_t* atual = self->head;
     pagina_t* anterior = NULL;
-    pagina_t* temp = NULL;
+
+    if(self->num_pags < 1) return;
     while (atual != NULL) {
-        if (atual->num == num_pagina) {
-            self->num_pags--;
+        if (atual->num == num_pagina && atual->quadro_num == quadro) {
+            if (atual == self->last) {
+                return;
+            } 
             if (anterior != NULL) {
                 anterior->next = atual->next;
             } else {
-                self->head = atual->next;
-                self->last = atual->next;
+                *head = atual->next;
             }
-            temp = atual;
+            lru_insere_fila(self, atual);
             break;
         } else {
             anterior = atual;
             atual = atual->next;
         }
     }
-    
 }
-
-
-
 
 int lru_prox_pag_num(lru_t* self)
 {

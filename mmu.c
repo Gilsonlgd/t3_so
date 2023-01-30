@@ -158,10 +158,7 @@ err_t mmu_le(mmu_t *self, int endereco, int *pvalor)
     return err;
   }
   tab_pag_muda_acessada(self->tab_pag, pagina, true);
-  //t_printf("AQUIII PAG: %d", pagina);
-  lru_imprime(self->lru);
-  //lru_atualiza_pagina(self->lru, pagina);
-  //lru_imprime(self->lru);
+  lru_atualiza_pagina(self->lru, pagina, tab_pag_quadro(self->tab_pag, pagina));
   return mem_le(self->mem, end_fis, pvalor);
 }
 
@@ -175,6 +172,7 @@ err_t mmu_escreve(mmu_t *self, int endereco, int valor)
   }
   tab_pag_muda_acessada(self->tab_pag, pagina, true);
   tab_pag_muda_alterada(self->tab_pag, pagina, true);
+  lru_atualiza_pagina(self->lru, pagina, tab_pag_quadro(self->tab_pag, pagina));
   return mem_escreve(self->mem, end_fis, valor);
 }
 
