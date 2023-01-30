@@ -1,0 +1,25 @@
+MEMÓRIA FOLGADA: 200
+|Informacoes do SO:|
+TempoT_exec: 1858, Tempo_CPU: 1858, Num_Interrup: 129
+----------------------------------------------
+|Metricas dos processos: quantum = 5|
+num:6, tempo_retorno: 1853, tempo_bloq: 0,
+ tempo_exec: 1320, tempo_esp: 48650, tempoM_retorno: 1105,6817626953,
+ num_bloq: 0, num_preemp: 44 
+
+num:5, tempo_retorno: 988, tempo_bloq: 0,
+ tempo_exec: 480, tempo_esp: 8245, tempoM_retorno: 515,3125000000,
+ num_bloq: 0, num_preemp: 16 
+
+MEMÓRIA PEQUENA: 30
+|Informacoes do SO:|
+TempoT_exec: 2723, Tempo_CPU: 2723, Num_Interrup: 1023
+----------------------------------------------
+|Metricas dos processos: quantum = 5|
+num:6, tempo_retorno: 2718, tempo_bloq: 0,
+ tempo_exec: 1947, tempo_esp: 104973, tempoM_retorno: 1614,9692382812,
+ num_bloq: 0, num_preemp: 65 
+
+num:5, tempo_retorno: 1471, tempo_bloq: 0,
+ tempo_exec: 720, tempo_esp: 18125, tempoM_retorno: 755,2083129883,
+ num_bloq: 0, num_preemp: 24 
